@@ -1,9 +1,18 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
+const connectDB = require('./config/db')
+const Driver = require('./models/Driver')
+const Patient = require('./models/Patient')
+const Vehicule = require('./models/Vehicule')
+const User = require('./models/User')
+const bcrypt =require('bcrypt')
+
+// Connect to database
+connectDB()
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -13,8 +22,8 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1900,
+    height: 900,
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -33,6 +42,53 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  // authenticate user
+  ipcMain.on('userInfo:load',async (e, item) => {
+    try {
+      const user = await User.findOne({ userName: item.username})
+
+      if ( user == null) {
+        win.webContents.send('userInfo:get', JSON.stringify(user))
+      }
+      try {
+        if (await bcrypt.compare(item.password, user.password)) {
+          win.webContents.send('userInfo:get', JSON.stringify(user))
+        }else {
+          win.webContents.send('userInfo:get', 800)
+
+        }
+
+      } catch (error) {
+        console.log(error)
+      }
+      win.webContents.send('userInfo:get', JSON.stringify(userInfo))
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  async function createAdminUser() {
+    try {
+      const docCount = await User.countDocuments({}).exec();
+
+      const salt = await bcrypt.genSalt()
+      const hashedPassword = await bcrypt.hash('12345678', salt)
+     
+      if ( docCount == 0) {
+        await User.create({
+          userName: 'admin',
+          password: hashedPassword
+        
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  createAdminUser();
 }
 
 // Quit when all windows are closed.
