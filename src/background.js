@@ -89,6 +89,65 @@ async function createWindow() {
   }
 
   createAdminUser();
+
+  // Load drivers
+  ipcMain.on('drivers:load', senddrivers)
+
+  // Send drivers items
+  async function senddrivers() {
+    try {
+      const drivers = await Driver.find().sort({ created: 1 })
+      win.webContents.send('drivers:get', JSON.stringify(drivers))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add drivers
+  ipcMain.on('drivers:add', async (e, item) => {
+    try {
+      await Driver.create(item)
+      senddrivers()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete drivers
+  ipcMain.on('drivers:delete', async (e, id) => {
+    try {
+      await Driver.findOneAndDelete({ _id: id })
+      senddrivers()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit drivers
+  ipcMain.on('drivers:edit', async (e, item) => {
+    try {
+      const doc = await Driver.findById(item._id);
+      doc.firstName = item.firstName;
+      doc.lastName = item.lastName;
+      doc.city = item.city;
+      doc.street = item.street;
+      doc.state = item.state;
+      doc.zip = item.zip;
+      doc.country = item.country;
+      doc.photo = item.photo;
+      
+      
+      doc.mobile = item.mobile;
+      doc.dateOfBirth = item.dateOfBirth;
+      doc.driverLicenseNumber = item.driverLicenseNumber;
+      doc.bloodGroup = item.bloodGroup;
+      doc.experationDate = item.experationDate;
+      await doc.save();
+      senddrivers()
+    } catch (error) {
+      console.log(error)
+    }
+  })
 }
 
 // Quit when all windows are closed.

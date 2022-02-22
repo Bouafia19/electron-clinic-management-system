@@ -52,6 +52,8 @@
         @click="drawer = !drawer"
       ></v-app-bar-nav-icon>
 
+      <v-spacer></v-spacer>
+
       <template>
         <div class="text-center">
           <v-menu >
@@ -116,9 +118,10 @@
     data: () => ({ 
       drawer: null,
       items: [
-          { title: 'Tableau de bord', icon: 'mdi-view-dashboard', to: '/' },
-          { title: 'Patients', icon: 'mdi-account-injury', to: '' },
-          { title: 'Chauffeurs', icon: 'mdi-account-tie-hat', to: '' },
+          { title: 'Accueil', icon: 'mdi-home', to: '/' },
+          { title: 'Tableau de bord', icon: 'mdi-view-dashboard', to: '' },
+          { title: 'Patients', icon: 'mdi-clipboard-account', to: '' },
+          { title: 'Chauffeurs', icon: 'mdi-badge-account-horizontal', to: '/drivers' },
           { title: 'Voitures', icon: 'mdi-car', to: '' },
           { title: 'Missions', icon: 'mdi-ballot', to: '' },
           { title: 'À propos', icon: 'mdi-information', to: '/about' },
