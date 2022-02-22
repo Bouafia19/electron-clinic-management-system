@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Drivers from '../views/Drivers.vue'
+import Patients from '../views/Patients.vue'
 import auth from '../middleware/auth.js';
 
 Vue.use(VueRouter)
@@ -27,6 +28,11 @@ const routes = [
     path: '/drivers',
     name: 'Drivers',
     component: Drivers,
+  },
+  {
+    path: '/patients',
+    name: 'Patients',
+    component: Patients,
   },
 ]
 

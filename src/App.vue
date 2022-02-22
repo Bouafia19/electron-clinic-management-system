@@ -120,7 +120,7 @@
       items: [
           { title: 'Accueil', icon: 'mdi-home', to: '/' },
           { title: 'Tableau de bord', icon: 'mdi-view-dashboard', to: '' },
-          { title: 'Patients', icon: 'mdi-clipboard-account', to: '' },
+          { title: 'Patients', icon: 'mdi-clipboard-account', to: '/patients' },
           { title: 'Chauffeurs', icon: 'mdi-badge-account-horizontal', to: '/drivers' },
           { title: 'Voitures', icon: 'mdi-car', to: '' },
           { title: 'Missions', icon: 'mdi-ballot', to: '' },

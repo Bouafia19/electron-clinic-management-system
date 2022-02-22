@@ -148,6 +148,67 @@ async function createWindow() {
       console.log(error)
     }
   })
+
+
+  /////////////////////////////////
+  // Load patients
+  ipcMain.on('patients:load', sendPatients)
+
+  // Send patients items
+  async function sendPatients() {
+    try {
+      const patients = await Patient.find().sort({ created: 1 })
+      win.webContents.send('patients:get', JSON.stringify(patients))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add patients
+  ipcMain.on('patients:add', async (e, item) => {
+    try {
+      await Patient.create(item)
+      sendPatients()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete patients
+  ipcMain.on('patients:delete', async (e, id) => {
+    try {
+      await Patient.findOneAndDelete({ _id: id })
+      sendPatients()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit patients
+  ipcMain.on('patients:edit', async (e, item) => {
+    try {
+      const doc = await Patient.findById(item._id);
+      doc.firstName = item.firstName;
+      doc.lastName = item.lastName;
+      doc.city = item.city;
+      doc.street = item.street;
+      doc.state = item.state;
+      doc.zip = item.zip;
+      doc.country = item.country;
+      doc.photo = item.photo;
+      
+      
+      doc.mobile = item.mobile;
+      doc.dateOfBirth = item.dateOfBirth;
+      doc.gender = item.gender;
+      doc.bloodGroup = item.bloodGroup;
+      
+      await doc.save();
+      sendPatients()
+    } catch (error) {
+      console.log(error)
+    }
+  })
 }
 
 // Quit when all windows are closed.
