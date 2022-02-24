@@ -2,8 +2,8 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="patients"
-      sort-by="fullName"
+      :items="vehicles"
+      sort-by="model"
       :search="search"
       class="elevation-4"
       :footer-props="{
@@ -11,12 +11,16 @@
       }"
     >
       <template v-slot:[`item.fullName`]="{ item }">
-        {{ item.firstName }} {{ item.lastName }}
+        {{ item.driverId.firstName }} {{ item.driverId.lastName }}
       </template>
 
-      <template v-slot:[`item.address`]="{ item }">
+      <!-- <template v-slot:[`item.address`]="{ item }">
         {{ item.street }} {{ item.city }}, {{ item.state }}, {{ item.country }}
-      </template>
+      </template> -->
+
+      <!-- <template v-slot:[`item.fullName`]="{ item }">
+        {{ item.firstName }} {{ item.lastName }}
+      </template> -->
 
       <template v-slot:[`footer.page-text`]="items"> 
         {{ items.pageStart }} - {{ items.pageStop }} {{ 'de' }} {{ items.itemsLength }} 
@@ -26,15 +30,15 @@
         {{ header.text }}
       </template> -->
 
-      <template v-slot:[`item.dateOfBirth`]="{ item }">
+      <!-- <template v-slot:[`item.dateOfBirth`]="{ item }">
         {{ formatDate(item.dateOfBirth) }}
-      </template>
+      </template> -->
 
       <template v-slot:top>
         <v-toolbar
           flat
         >
-          <v-toolbar-title>{{ 'Patients' }}</v-toolbar-title>
+          <v-toolbar-title>{{ 'Voitures' }}</v-toolbar-title>
           <v-divider
             class="mx-4"
             inset
@@ -75,7 +79,7 @@
               <v-card-text>
                 <v-container>
                   <v-card-title class="justify-center" style="background-color: #ffffff">
-                    <h2 class="text-uppercase" style="color: #00366f;">{{ 'Patient' }}</h2>
+                    <h2 class="text-uppercase" style="color: #00366f;">{{ 'Voiture' }}</h2>
                     <v-spacer></v-spacer>
                     <v-avatar 
                       size="150"
@@ -87,7 +91,7 @@
                           contain
                           width="100%"
                           style="float: right; border: 1px solid;"
-                          alt="Product Image"
+                          alt="Voiture Image"
                         >  
                           <v-file-input 
                             v-model="image" 
@@ -115,7 +119,7 @@
                         cols="12"
                         sm="6"
                         md="1">
-                        <h4 style="color: #00366f;">{{ 'Informations générales' }}</h4>
+                        <h4 style="color: #00366f;">{{ 'Voiture' }}</h4>
                       </v-col>
 
                       <v-divider
@@ -129,26 +133,22 @@
                         sm="6"
                         md="4"
                       >
-                        <v-row>
-                          <v-col>
-                            <v-text-field
-                              v-model="editedItem.firstName"
-                              :label="'Prénom'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-                          <v-col>
-                            <v-text-field
-                              v-model="editedItem.lastName"
-                              :label="'Nom'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
                         
-                        <v-menu
+                            <v-text-field
+                              v-model="editedItem.model"
+                              :label="'Modèle'"
+                              outlined
+                              dense
+                            ></v-text-field>
+                         
+                            <v-text-field
+                              v-model="editedItem.licensePlate"
+                              :label="'Immatriculation'"
+                              outlined
+                              dense
+                            ></v-text-field>
+                        
+                        <!-- <v-menu
                           v-model="date_of_birth"
                           :close-on-content-click="false"
                           max-width="290"
@@ -171,12 +171,12 @@
                             v-model="editedItem.dateOfBirth"
                             @change="date_of_birth = false"
                           ></v-date-picker>
-                        </v-menu>
+                        </v-menu> -->
 
                         <v-text-field
-                          v-model="editedItem.mobile"
-                          :label="'Téléphone'"
-                          prepend-icon="mdi-cellphone"
+                          v-model="editedItem.chassisNumber"
+                          :label="'Numéro de châssis'"
+                         
                           outlined
                           dense
                         ></v-text-field>
@@ -187,7 +187,7 @@
                         sm="6"
                         md="1"
                       >
-                        <h4 style="color: #00366f;">{{ 'Information sur la santé' }}</h4>
+                        <h4 style="color: #00366f;">{{ 'Chauffeur' }}</h4>
                       </v-col>
 
                       <v-divider
@@ -204,28 +204,63 @@
                         <v-row>
                           <v-col>
                             <v-select
-                                :items="items"
-                                label="Sex"
-                                v-model="editedItem.gender"
-                                prepend-icon="mdi-gender-male"
-                                dense
-                                outlined
-                            ></v-select>
+                              :items="drivers"
+                              :label="'Chauffeurs'"
+                              item-value="_id"
+                              item-text="lastName"
+                              prepend-icon="mdi-badge-account-horizontal"
+                              v-model="editedItem.driverId"
+                              outlined
+                              dense
+                            >
+                              <template slot="selection" slot-scope="data">
+                                {{ data.item.lastName }} {{ data.item.firstName }}
+                              </template>
+                              <template slot="item" slot-scope="data">
+                                {{ data.item.lastName }} {{ data.item.firstName }}
+                              </template>
+                            
+                            </v-select>
                           
                             <v-text-field
-                              v-model="editedItem.bloodGroup"
-                              :label="'groupe sanguin'"
-                              prepend-icon="mdi-blood-bag"
+                              v-model="editedItem.odometer"
+                              :label="'compteur kilométrique'"
+                              type="number"
+                              prepend-icon="mdi-counter"
                               outlined
                               dense
                             ></v-text-field>
                           
+                            <v-menu
+                              v-model="assignment_date"
+                              :close-on-content-click="false"
+                              max-width="290"
+                            >
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-text-field
+                                  :value="computedDateFormattedAssignmentDate"
+                                  prepend-icon="mdi-calendar"
+                                  clearable
+                                  :label="'date d\'affectation'"
+                                  readonly
+                                  outlined
+                                  dense
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  @click:clear="editedItem.assignmentDate = null"
+                                ></v-text-field>
+                              </template>
+                              <v-date-picker
+                                  v-model="editedItem.assignmentDate"
+                                  @change="assignment_date = false"
+                              ></v-date-picker>
+                            </v-menu>    
                           </v-col>
                         </v-row>
                       </v-col> 
                     </v-row>
                     
-                    <v-row>
+                    <!-- <v-row>
                       <v-col
                         cols="12"
                         sm="6"
@@ -293,7 +328,7 @@
                           </v-col>
                         </v-row>
                       </v-col>
-                    </v-row>
+                    </v-row> -->
                   </v-container>    
                 </v-container>
               </v-card-text>
@@ -366,62 +401,54 @@
 
   export default {
     data: () => ({
-      items: ['mâle', 'femelle'],
       dialog: false,
       dialogDelete: false,
       search: '',
       image: undefined,
       headers: [
         {
-          text: 'Nom et Prénom',
+          text: 'Modèle',
           align: 'start',
-          value: 'fullName',
+          value: 'model',
         },
-        { text: 'Date de naissance', value: 'dateOfBirth' },
-        { text: 'Mobile', value: 'mobile' },
-        { text: "Addresse", value: "address" },
-        { text: 'Sex', value: 'gender' },
-        { text: 'Groupe sanguin', value: 'bloodGroup' },
+        { text: 'Chauffeur', value: 'fullName' },
+        { text: 'Immatriculation', value: 'licensePlate' },
+        { text: "numéro de châssis", value: "chassisNumber" },
+        { text: 'odomètre', value: 'odometer' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      patients: [],
+      vehicles: [],
+      drivers: [],
       date_of_birth: '',
-      experation_date: '',
+      assignment_date: '',
       editedIndex: -1,
       editedItem: {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        gender: '',
-        bloodGroup: '',
-        city: '',
-        street: '',
-        state: '',
-        zip: '',
-        country: '',
-        mobile: '',
+        model: '',
+        licensePlate: '',
+        driverId: '',
+        assignmentDate: '',
+        chassisNumber: '',
+        odometer: '',
         photo: '',
       },
       defaultItem: {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        gender: '',
-        bloodGroup: '',
-        city: '',
-        street: '',
-        state: '',
-        zip: '',
-        country: '',
-        mobile: '',
+        model: '',
+        licensePlate: '',
+        driverId: '',
+        assignmentDate: '',
+        chassisNumber: '',
+        odometer: '',
         photo: '',
       },
     }),
 
     computed: {
-      computedDateFormattedDateOfBirth () {
-        return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).format('dddd, MMMM Do YYYY') : ''
+      computedDateFormattedAssignmentDate () {
+        return this.editedItem.assignmentDate ? moment(this.editedItem.assignmentDate).format('dddd, MMMM Do YYYY') : ''
       },
+    //   computedDateFormattedDateOfBirth () {
+    //     return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).format('dddd, MMMM Do YYYY') : ''
+    //   },
       formTitle () {
         return this.editedIndex === -1 ? 'Nouveau' : 'Modifier'
       },
@@ -459,14 +486,19 @@
       },
 
       initialize () {
-        ipcRenderer.send('patients:load'),
-        ipcRenderer.on('patients:get', (e, patients) => {
-          this.patients = JSON.parse(patients)
+        ipcRenderer.send('vehicles:load'),
+        ipcRenderer.on('vehicles:get', (e, vehicles) => {
+          this.vehicles = JSON.parse(vehicles)
+        })
+        // Load Drivers
+        ipcRenderer.send('drivers:load'),
+        ipcRenderer.on('drivers:get', (e, drivers) => {
+          this.drivers = JSON.parse(drivers)
         })
       },
 
       editItem (item) {
-        this.editedIndex = this.patients.indexOf(item)
+        this.editedIndex = this.vehicles.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
@@ -477,7 +509,7 @@
       },
 
       deleteItemConfirm () {
-        ipcRenderer.send('patients:delete', this.editedIndex)
+        ipcRenderer.send('vehicles:delete', this.editedIndex)
         this.closeDelete()
       },
 
@@ -500,9 +532,9 @@
       save () {
         this.close()
         if (this.editedIndex > -1) {
-          ipcRenderer.send('patients:edit', this.editedItem)
+          ipcRenderer.send('vehicles:edit', this.editedItem)
         } else {
-          ipcRenderer.send('patients:add', this.editedItem)
+          ipcRenderer.send('vehicles:add', this.editedItem)
         }
         this.close()
       },
@@ -527,7 +559,7 @@
   ::v-deep table > thead > tr:last-child > th {
     color: white !important;
   }
-  ::v-deep table > thead > tr:last-child > th .v-icon__svg {
+  ::v-deep table > thead > tr:last-child > th .header__icon {
     color: #ffffff !important;
   }
   ::v-deep .mdi-phone-classic::before {
@@ -554,7 +586,11 @@
   ::v-deep .mdi-blood-bag::before {
     color: #F50057 !important;
   }
-  ::v-deep .mdi-gender-male::before {
+  ::v-deep .mdi-counter::before {
     color: #F50057 !important;
   }
+  ::v-deep .mdi-badge-account-horizontal::before {
+    color: #F50057 !important;
+  }
+  
 </style>

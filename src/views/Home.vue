@@ -63,12 +63,10 @@
           { title: 'Tableau de bord', img: require('../assets/icons/couleur/dashboard.png'), to: '/dashboard', model: 'component', description: 'composant qui affiche le tableau de bord' },
           { title: 'Patients', img: require('../assets/icons/couleur/hospitalisation.png'), to: '/patients', model: 'Patient', description: 'module qui gère la fonctionnalité CRUD des patient' },
           { title: 'Chauffeurs', img: require('../assets/icons/couleur/driver.png'), to: '/drivers', model: 'Driver', description: 'module qui gère la fonctionnalité CRUD des chauffeurs' },
-          { title: 'Voitures', img: require('../assets/icons/couleur/car.png'), to: '/vehicules', model: 'Vehicule', description: 'module qui gère la fonctionnalité CRUD des voitures' },
+          { title: 'Voitures', img: require('../assets/icons/couleur/car.png'), to: '/vehicles', model: 'Vehicle', description: 'module qui gère la fonctionnalité CRUD des voitures' },
           { title: 'Missions', img: require('../assets/icons/couleur/target.png'), to: '/missions', model: 'Mission', description: 'module qui gère la fonctionnalité CRUD des missions' },
           { title: 'Paramètres', img: require('../assets/icons/couleur/settings.png'), to: '/setting', model: 'component', description: 'composant qui affiche les paramètres' },
           { title: 'À propos', img: require('../assets/icons/couleur/information.png'), to: '/about', model: 'component', description: 'composant qui affiche la page À propos' }
-
-
         ],
       }),
   }

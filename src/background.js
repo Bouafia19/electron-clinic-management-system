@@ -7,7 +7,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 const connectDB = require('./config/db')
 const Driver = require('./models/Driver')
 const Patient = require('./models/Patient')
-const Vehicule = require('./models/Vehicule')
+const Vehicle = require('./models/Vehicle')
 const User = require('./models/User')
 const bcrypt =require('bcrypt')
 
@@ -149,8 +149,6 @@ async function createWindow() {
     }
   })
 
-
-  /////////////////////////////////
   // Load patients
   ipcMain.on('patients:load', sendPatients)
 
@@ -205,6 +203,58 @@ async function createWindow() {
       
       await doc.save();
       sendPatients()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Load vehicles
+  ipcMain.on('vehicles:load', sendVehicles)
+
+  // Send vehicles items
+  async function sendVehicles() {
+    try {
+      const vehicles = await Vehicle.find().sort({ created: 1 }).populate("driverId")
+      win.webContents.send('vehicles:get', JSON.stringify(vehicles))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add vehicles
+  ipcMain.on('vehicles:add', async (e, item) => {
+    try {
+      await Vehicle.create(item)
+      sendVehicles()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete vehicles
+  ipcMain.on('vehicles:delete', async (e, id) => {
+    try {
+      await Vehicle.findOneAndDelete({ _id: id })
+      sendVehicles()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit vehicles
+  ipcMain.on('vehicles:edit', async (e, item) => {
+    try {
+      const doc = await Vehicle.findById(item._id);
+      doc.model = item.model;
+      doc.licensePlate = item.licensePlate;
+      doc.driverId = item.driverId;
+      doc.assignmentDate = item.assignmentDate;
+      doc.chassisNumber = item.chassisNumber;
+      doc.odometer = item.odometer;
+      doc.photo = item.photo;
+  
+      await doc.save();
+      sendVehicles()
     } catch (error) {
       console.log(error)
     }

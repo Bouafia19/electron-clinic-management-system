@@ -10,6 +10,10 @@ const MissionSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'Vehicule'
   },
+  driverId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Driver'
+  },
   station: {
     type: String,
   },
