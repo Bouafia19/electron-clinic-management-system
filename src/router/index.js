@@ -40,6 +40,18 @@ const routes = [
     name: 'Vehicles',
     component: Vehicles,
   },
+  {
+    path: '/missions',
+    component: () => import('../views/Mission/index.vue')
+  },
+  {
+    path: '/mission/:id/edit',
+    component: () => import('../views/Mission/edit.vue')
+  },
+  {
+    path: '/mission/new',
+    component: () => import('../views/Mission/new.vue')
+  },
 ]
 
 const router = new VueRouter({

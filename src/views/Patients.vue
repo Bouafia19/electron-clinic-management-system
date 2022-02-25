@@ -273,7 +273,7 @@
                           </v-col>
                         </v-row>
 
-                        <v-row>
+                        <!-- <v-row>
                           <v-col class="py-0">
                             <v-text-field
                               v-model="editedItem.country"
@@ -291,7 +291,7 @@
                               dense
                             ></v-text-field>
                           </v-col>
-                        </v-row>
+                        </v-row> -->
                       </v-col>
                     </v-row>
                   </v-container>    
@@ -397,8 +397,8 @@
         city: '',
         street: '',
         state: '',
-        zip: '',
-        country: '',
+        // zip: '',
+        // country: '',
         mobile: '',
         photo: '',
       },
@@ -411,8 +411,8 @@
         city: '',
         street: '',
         state: '',
-        zip: '',
-        country: '',
+        // zip: '',
+        // country: '',
         mobile: '',
         photo: '',
       },
@@ -420,7 +420,7 @@
 
     computed: {
       computedDateFormattedDateOfBirth () {
-        return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).format('dddd, MMMM Do YYYY') : ''
+        return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).locale('fr').format('dddd, MMMM Do YYYY') : ''
       },
       formTitle () {
         return this.editedIndex === -1 ? 'Nouveau' : 'Modifier'

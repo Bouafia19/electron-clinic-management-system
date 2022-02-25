@@ -9,6 +9,7 @@ const Driver = require('./models/Driver')
 const Patient = require('./models/Patient')
 const Vehicle = require('./models/Vehicle')
 const User = require('./models/User')
+const Mission = require('./models/Mission')
 const bcrypt =require('bcrypt')
 
 // Connect to database
@@ -255,6 +256,65 @@ async function createWindow() {
   
       await doc.save();
       sendVehicles()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Load missions
+  ipcMain.on('missions:load', sendMissions)
+
+  // Send missions items
+  async function sendMissions() {
+    try {
+      const missions = await Mission.find().sort({ created: 1 }).populate("patientId")
+      win.webContents.send('missions:get', JSON.stringify(missions))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add missions
+  ipcMain.on('missions:add', async (e, item) => {
+    try {
+      await Mission.create(item)
+      sendMissions()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete missions
+  ipcMain.on('missions:delete', async (e, id) => {
+    try {
+      await Mission.findOneAndDelete({ _id: id })
+      sendMissions()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit missions
+  ipcMain.on('missions:edit', async (e, item) => {
+    try {
+      const doc = await Mission.findById(item._id);
+      // doc.firstName = item.firstName;
+      // doc.lastName = item.lastName;
+      // doc.city = item.city;
+      // doc.street = item.street;
+      // doc.state = item.state;
+      // doc.zip = item.zip;
+      // doc.country = item.country;
+      // doc.photo = item.photo;
+      
+      
+      // doc.mobile = item.mobile;
+      // doc.dateOfBirth = item.dateOfBirth;
+      // doc.driverLicenseNumber = item.driverLicenseNumber;
+      // doc.bloodGroup = item.bloodGroup;
+      // doc.experationDate = item.experationDate;
+      await doc.save();
+      sendMissions()
     } catch (error) {
       console.log(error)
     }

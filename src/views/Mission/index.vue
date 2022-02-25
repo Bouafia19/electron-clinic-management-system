@@ -2,7 +2,7 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="drivers"
+      :items="missions"
       sort-by="lastName"
       :search="search"
       class="elevation-4"
@@ -30,11 +30,15 @@
         {{ formatDate(item.dateOfBirth) }}
       </template>
 
+      <template v-slot:[`item.date`]="{ item }">
+        {{ formatDate(item.date) }}
+      </template>
+
       <template v-slot:top>
         <v-toolbar
           flat
         >
-          <v-toolbar-title>{{ 'Chauffeurs' }}</v-toolbar-title>
+          <v-toolbar-title>{{ 'Missions' }}</v-toolbar-title>
           <v-divider
             class="mx-4"
             inset
@@ -61,13 +65,14 @@
                 class="mb-2"
                 v-bind="attrs"
                 v-on="on"
+                :to="'/mission/new'"
               >
                 <v-icon large>
                   mdi-plus-circle
                 </v-icon>
               </v-btn>
             </template>
-            <v-card>
+            <!-- <v-card>
               <v-card-title>
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
@@ -296,7 +301,7 @@
                           </v-col>
                         </v-row>
 
-                        <!-- <v-row>
+                        <v-row>
                           <v-col class="py-0">
                             <v-text-field
                               v-model="editedItem.country"
@@ -314,7 +319,7 @@
                               dense
                             ></v-text-field>
                           </v-col>
-                        </v-row> -->
+                        </v-row>
                       </v-col>
                     </v-row>
                   </v-container>    
@@ -336,7 +341,7 @@
                   {{ 'Sauvegarder' }}
                 </v-btn>
               </v-card-actions>
-            </v-card>
+            </v-card> -->
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="700px">
             <v-card>
@@ -356,7 +361,7 @@
           small
           class="mr-2"
           color="primary"
-          @click="editItem(item)"
+          @click="routerClick(item)"
         >
           mdi-pencil
         </v-icon>
@@ -399,14 +404,14 @@
           align: 'start',
           value: 'fullName',
         },
-        { text: 'Date de naissance', value: 'dateOfBirth' },
-        { text: 'Mobile', value: 'mobile' },
-        { text: "Addresse", value: "address" },
-        { text: 'Permis de conduire', value: 'driverLicenseNumber' },
-        { text: 'Groupe sanguin', value: 'bloodGroup' },
+        { text: 'Date', value: 'date' },
+        // { text: 'Mobile', value: 'mobile' },
+        // { text: "Addresse", value: "address" },
+        // { text: 'Permis de conduire', value: 'driverLicenseNumber' },
+        // { text: 'Groupe sanguin', value: 'bloodGroup' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      drivers: [],
+      missions: [],
       date_of_birth: '',
       experation_date: '',
       editedIndex: -1,
@@ -419,8 +424,8 @@
         experationDate: '',
         city: '',
         street: '',
-        // state: '',
-        // zip: '',
+        state: '',
+        zip: '',
         country: '',
         mobile: '',
         photo: '',
@@ -434,8 +439,8 @@
         experationDate: '',
         city: '',
         street: '',
-        // state: '',
-        // zip: '',
+        state: '',
+        zip: '',
         country: '',
         mobile: '',
         photo: '',
@@ -444,10 +449,10 @@
 
     computed: {
       computedDateFormattedExperationDate () {
-        return this.editedItem.experationDate ? moment(this.editedItem.experationDate).locale('fr').format('dddd, MMMM Do YYYY') : ''
+        return this.editedItem.experationDate ? moment(this.editedItem.experationDate).format('dddd, MMMM Do YYYY') : ''
       },
       computedDateFormattedDateOfBirth () {
-        return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).locale('fr').format('dddd, MMMM Do YYYY') : ''
+        return this.editedItem.dateOfBirth ? moment(this.editedItem.dateOfBirth).format('dddd, MMMM Do YYYY') : ''
       },
       formTitle () {
         return this.editedIndex === -1 ? 'Nouveau' : 'Modifier'
@@ -468,6 +473,9 @@
     },
 
     methods: {
+      routerClick(item) {
+        this.$router.push({ path: `/mission/${item._id}/edit`  });
+      },
       formatDate(value) {
         return moment(value).locale('fr').format("MMMM DD YYYY")
       },
@@ -486,14 +494,14 @@
       },
 
       initialize () {
-        ipcRenderer.send('drivers:load'),
-        ipcRenderer.on('drivers:get', (e, drivers) => {
-          this.drivers = JSON.parse(drivers)
+        ipcRenderer.send('missions:load'),
+        ipcRenderer.on('missions:get', (e, missions) => {
+          this.missions = JSON.parse(missions)
         })
       },
 
       editItem (item) {
-        this.editedIndex = this.drivers.indexOf(item)
+        this.editedIndex = this.missions.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
@@ -504,7 +512,7 @@
       },
 
       deleteItemConfirm () {
-        ipcRenderer.send('drivers:delete', this.editedIndex)
+        ipcRenderer.send('missions:delete', this.editedIndex)
         this.closeDelete()
       },
 
@@ -527,9 +535,9 @@
       save () {
         this.close()
         if (this.editedIndex > -1) {
-          ipcRenderer.send('drivers:edit', this.editedItem)
+          ipcRenderer.send('missions:edit', this.editedItem)
         } else {
-          ipcRenderer.send('drivers:add', this.editedItem)
+          ipcRenderer.send('missions:add', this.editedItem)
         }
         this.close()
       },
