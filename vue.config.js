@@ -4,8 +4,9 @@ module.exports = {
       nodeIntegration: true,
       removeElectronJunk: false,
       builderOptions: {
-        icon: 'src/assets/icons/clinic.png',
-        productName: "medical clinic"
+        icon: 'src/assets/icons/couleur/clinic.png',
+        productName: "medical clinic",
+        appId: 'https://nextchallenge-dz.com/',
       }
     }
   },

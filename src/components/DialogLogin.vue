@@ -10,7 +10,7 @@
                         md="6" 
                     >
                         <v-img 
-                            src="../assets/icons/couleur/hospital_office.png"
+                            src="../assets/icons/couleur/hospital-sign.png"
                             contain
                             width="100%"
                             alt="Next Challenge"

@@ -10,8 +10,8 @@
           'items-per-page-text': 'Lignes par page :',           
       }"
     >
-      <template v-slot:[`item.fullName`]="{ item }">
-        {{ item.firstName }} {{ item.lastName }}
+       <template v-slot:[`item.fullName`]="{ item }">
+        {{ item.driverId.firstName }} {{ item.driverId.lastName }}
       </template>
 
       <template v-slot:[`item.address`]="{ item }">
@@ -55,7 +55,7 @@
           <v-spacer></v-spacer>
           <v-dialog
             v-model="dialog"
-            max-width="1350px"
+            max-width="700px"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -65,283 +65,107 @@
                 class="mb-2"
                 v-bind="attrs"
                 v-on="on"
-                :to="'/mission/new'"
               >
                 <v-icon large>
                   mdi-plus-circle
                 </v-icon>
               </v-btn>
             </template>
-            <!-- <v-card>
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
+           <v-card>
+            <v-card-title>
+              <span class="text-h5">{{ formTitle }}</span>
+            </v-card-title>
 
-              <v-card-text>
-                <v-container>
-                  <v-card-title class="justify-center" style="background-color: #ffffff">
-                    <h2 class="text-uppercase" style="color: #00366f;">{{ 'Chauffeur' }}</h2>
-                    <v-spacer></v-spacer>
-                    <v-avatar 
-                      size="150"
-                      rounded="lg"
-                    >
-                      <v-hover v-slot="{ hover }">
-                        <v-img 
-                          :src="editedItem.photo"
-                          contain
-                          width="100%"
-                          style="float: right; border: 1px solid;"
-                          alt="Product Image"
-                        >  
-                          <v-file-input 
-                            v-model="image" 
-                            type="file" 
-                            :label="'Photo'"
-                            hide-input
-                            placeholder="Photo"
-                            v-if="hover"
-                            @change="onFileChange"  
-                          />     
-                        </v-img> 
-                      </v-hover>
-                    </v-avatar> 
-                  </v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="3"
+                  >
+                    <h4 style="color: #00366f">{{ 'Informations de la mission' }}</h4>
+                  </v-col>
 
                   <v-divider
-                    class="mx-4"
-                    inset
+                      class="mx-4"
+                      inset
+                      vertical
+                  ></v-divider>
+                  <v-col
+                   
+                  >
+                    <v-text-field
+                      v-model="editedItem.code"
+                      :label="'Code'"
+                      outlined
+                      dense
+                    ></v-text-field>
+
+                    <v-select
+                      :items="drivers"
+                      :label="'Chauffeurs'"
+                      item-value="_id"
+                      item-text="raison"
+                      v-model="editedItem.driverId"
+                      return-object
+                      single-line
+                      outlined
+                      dense
                     >
-                  </v-divider>
+                      <template slot="selection" slot-scope="data">
+                          {{ data.item.lastName }} {{ data.item.firstName }}
+                      </template>
+                      <template slot="item" slot-scope="data">
+                          {{ data.item.lastName }} {{ data.item.firstName }}
+                      </template>
+                    </v-select>
 
-                  <v-container>
-                    <v-row>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="1">
-                        <h4 style="color: #00366f;">{{ 'Informations générales' }}</h4>
-                      </v-col>
+                    <v-select
+                      :items="vehicles"
+                      :label="'Voitures'"
+                      item-value="_id"
+                      item-text="model"
+                      v-model="editedItem.vehiculeId"
+                      return-object
+                      single-line
+                      outlined
+                      dense
+                      
+                      
+                    >
+                      <!-- <template slot="selection" slot-scope="data">
+                          {{ data.item.lastName }} {{ data.item.firstName }}
+                      </template>
+                      <template slot="item" slot-scope="data">
+                          {{ data.item.lastName }} {{ data.item.firstName }}
+                      </template> -->
+                    </v-select>
 
-                      <v-divider
-                        class="mx-4"
-                        inset
-                        vertical>
-                      </v-divider>
 
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                      >
-                        <v-row>
-                          <v-col>
-                            <v-text-field
-                              v-model="editedItem.firstName"
-                              :label="'Prénom'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-                          <v-col>
-                            <v-text-field
-                              v-model="editedItem.lastName"
-                              :label="'Nom'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-                        
-                        <v-menu
-                          v-model="date_of_birth"
-                          :close-on-content-click="false"
-                          max-width="290"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              :value="computedDateFormattedDateOfBirth"
-                              prepend-icon="mdi-calendar"
-                              clearable
-                              :label="'date de naissance'"
-                              readonly
-                              outlined
-                              dense
-                              v-bind="attrs"
-                              v-on="on"
-                              @click:clear="editedItem.dateOfBirth = null"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            v-model="editedItem.dateOfBirth"
-                            @change="date_of_birth = false"
-                          ></v-date-picker>
-                        </v-menu>
 
-                        <v-text-field
-                          v-model="editedItem.mobile"
-                          :label="'Téléphone'"
-                          prepend-icon="mdi-cellphone"
-                          outlined
-                          dense
-                        ></v-text-field>
-                      </v-col>
-                      <v-col></v-col>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="1"
-                      >
-                        <h4 style="color: #00366f;">{{ 'Permis de conduire' }}</h4>
-                      </v-col>
+                  </v-col>
+                  
+                </v-row>
+              </v-container>
+            </v-card-text>
 
-                      <v-divider
-                        class="mx-4"
-                        inset
-                        vertical>
-                      </v-divider>
-
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                      >
-                        <v-row>
-                          <v-col>
-                            <v-text-field
-                              v-model="editedItem.driverLicenseNumber"
-                              :label="'numéro de permis de conduire'"
-                              prepend-icon="mdi-card-account-details"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          
-                            <v-text-field
-                              v-model="editedItem.bloodGroup"
-                              :label="'groupe sanguin'"
-                              prepend-icon="mdi-blood-bag"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          
-                            <v-menu
-                              v-model="experation_date"
-                              :close-on-content-click="false"
-                              max-width="290"
-                            >
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-text-field
-                                  :value="computedDateFormattedExperationDate"
-                                  prepend-icon="mdi-calendar"
-                                  clearable
-                                  :label="'date d\'expiration'"
-                                  readonly
-                                  outlined
-                                  dense
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  @click:clear="editedItem.experationDate = null"
-                                ></v-text-field>
-                              </template>
-                              <v-date-picker
-                                  v-model="editedItem.experationDate"
-                                  @change="experation_date = false"
-                              ></v-date-picker>
-                            </v-menu>    
-                          </v-col>
-                        </v-row>
-                      </v-col> 
-                    </v-row>
-                    
-                    <v-row>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="1"
-                      >  
-                        <h4 style="color: #00366f;">{{ 'Addresse' }}</h4>
-                      </v-col>
-
-                      <v-divider
-                        class="mx-4"
-                        inset
-                        vertical>
-                      </v-divider>
-
-                      <v-col 
-                        cols="12"
-                        sm="6"
-                        md="4"
-                      >
-                        <v-text-field
-                          v-model="editedItem.street"
-                          :label="'Rue'"
-                          prepend-icon="mdi-map-marker"
-                          outlined
-                          dense
-                        ></v-text-field>
-
-                        <v-row>
-                          <v-col class="py-0">
-                            <v-text-field
-                              v-model="editedItem.city"
-                              :label="'Ville'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-
-                          <v-col class="py-0">
-                            <v-text-field
-                              v-model="editedItem.state"
-                              :label="'wilaya'"
-                              outlined
-                              dense  
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col class="py-0">
-                            <v-text-field
-                              v-model="editedItem.country"
-                              :label="'Pays'"
-                              outlined
-                              dense 
-                            ></v-text-field>
-                          </v-col>
-
-                          <v-col class="py-0">
-                            <v-text-field
-                              v-model="editedItem.zip"
-                              :label="'Code Postal'"
-                              outlined
-                              dense
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-                      </v-col>
-                    </v-row>
-                  </v-container>    
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="error"
-                  @click="close"
-                >
-                  {{ 'Annuler' }}
-                </v-btn>
-                <v-btn
-                  color="success"
-                  @click="save"
-                >
-                  {{ 'Sauvegarder' }}
-                </v-btn>
-              </v-card-actions>
-            </v-card> -->
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="error"
+                @click="close"
+              >
+                {{ 'Annuler' }}
+              </v-btn>
+              <v-btn
+                color="success"
+                @click="save"
+              >
+                {{ 'Sauvegarder' }}
+              </v-btn>
+            </v-card-actions>
+          </v-card> 
           </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="700px">
             <v-card>
@@ -400,50 +224,28 @@
       image: undefined,
       headers: [
         {
-          text: 'Nom et Prénom',
+          text: 'Code',
           align: 'start',
-          value: 'fullName',
+          value: 'code',
         },
+        { text: 'Nom et Prénom', value: 'fullName' },
+        { text: 'Automobile', value: 'vehiculeId.model' },
         { text: 'Date', value: 'date' },
-        // { text: 'Mobile', value: 'mobile' },
-        // { text: "Addresse", value: "address" },
-        // { text: 'Permis de conduire', value: 'driverLicenseNumber' },
-        // { text: 'Groupe sanguin', value: 'bloodGroup' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
+      drivers: [],
       missions: [],
-      date_of_birth: '',
-      experation_date: '',
+      vehicles: [],
       editedIndex: -1,
       editedItem: {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        driverLicenseNumber: '',
-        bloodGroup: '',
-        experationDate: '',
-        city: '',
-        street: '',
-        state: '',
-        zip: '',
-        country: '',
-        mobile: '',
-        photo: '',
+        code: '',
+        vehiculeId: '',
+        driverId: '',
       },
       defaultItem: {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        driverLicenseNumber: '',
-        bloodGroup: '',
-        experationDate: '',
-        city: '',
-        street: '',
-        state: '',
-        zip: '',
-        country: '',
-        mobile: '',
-        photo: '',
+        code: '',
+        vehiculeId: '',
+        driverId: '',
       },
     }),
 
@@ -493,11 +295,31 @@
           this.createImage(file);
       },
 
-      initialize () {
-        ipcRenderer.send('missions:load'),
+      loadDrivers () {
+        ipcRenderer.send('drivers:load'),
+        ipcRenderer.on('drivers:get', (e, drivers) => {
+          this.drivers = JSON.parse(drivers)
+        })
+      },
+
+      loadMissions() {
+        ipcRenderer.send('missions:load', this.id),
         ipcRenderer.on('missions:get', (e, missions) => {
           this.missions = JSON.parse(missions)
         })
+      },
+
+       loadVehicles() {
+        ipcRenderer.send('vehicles:load'),
+          ipcRenderer.on('vehicles:get', (e, vehicles) => {
+          this.vehicles = JSON.parse(vehicles)
+        })
+      },
+
+      initialize () {
+        this.loadMissions()
+        this.loadDrivers()
+        this.loadVehicles()
       },
 
       editItem (item) {

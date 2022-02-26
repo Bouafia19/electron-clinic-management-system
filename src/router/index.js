@@ -52,6 +52,10 @@ const routes = [
     path: '/mission/new',
     component: () => import('../views/Mission/new.vue')
   },
+  {
+    path: '/stations',
+    component: () => import('../views/Stations.vue')
+  },
 ]
 
 const router = new VueRouter({

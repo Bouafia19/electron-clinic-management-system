@@ -10,6 +10,8 @@ const Patient = require('./models/Patient')
 const Vehicle = require('./models/Vehicle')
 const User = require('./models/User')
 const Mission = require('./models/Mission')
+const Ride = require('./models/Ride')
+const Station = require('./models/Station')
 const bcrypt =require('bcrypt')
 
 // Connect to database
@@ -267,7 +269,7 @@ async function createWindow() {
   // Send missions items
   async function sendMissions() {
     try {
-      const missions = await Mission.find().sort({ created: 1 }).populate("patientId")
+      const missions = await Mission.find().sort({ created: 1 }).populate("driverId").populate("vehiculeId")
       win.webContents.send('missions:get', JSON.stringify(missions))
     } catch (err) {
       console.log(err)
@@ -315,6 +317,119 @@ async function createWindow() {
       // doc.experationDate = item.experationDate;
       await doc.save();
       sendMissions()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Load Mission Information
+  ipcMain.on('missionInfo:load',async (e, id) => {
+    try {
+      const missionInfo = await Mission.findOne({ _id: id}).populate("driverId").populate("vehiculeId")
+      win.webContents.send('missionInfo:get', JSON.stringify(missionInfo))
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+
+  // Load rides
+  ipcMain.on('rides:load',async (e, id) => {
+    try {
+      const rides = await Ride.find({ missionId: id}).populate("patientId").populate("stationId")
+      win.webContents.send('rides:get', JSON.stringify(rides))
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Send rides
+  async function sendRides(id) {
+    try {
+      const rides = await Ride.find({ missionId: id}).populate("patientId").populate("stationId")
+      win.webContents.send('rides:get', JSON.stringify(rides))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+   // Add rides
+   ipcMain.on('rides:add', async (e, item) => {
+     try {
+       await Ride.create(item)
+       sendRides(item.missionId)
+     } catch (error) {
+       console.log(error)
+     }
+   })
+ 
+   // Delete rides
+   ipcMain.on('rides:delete', async (e, item) => {
+     try {
+       await Ride.findOneAndDelete({ _id: item._id })
+       sendRides(item.missionId)
+     } catch (error) {
+       console.log(error)
+     }
+   })
+ 
+   // Edit rides
+   ipcMain.on('rides:edit', async (e, item) => {
+     try {
+       const doc = await Ride.findById(item._id);
+       doc.patientId = item.patientId;
+       doc.stationId = item.stationId;
+       doc.departureTime = item.departureTime;
+       doc.arrivingTime = item.arrivingTime;
+       doc.departureCounter = item.departureCounter;
+       doc.arrivalCounter = item.arrivalCounter;
+       await doc.save();
+       sendRides(item._id)
+     } catch (error) {
+       console.log(error)
+     }
+   })
+
+   // Load stations
+  ipcMain.on('stations:load', sendStations)
+
+  // Send stations items
+  async function sendStations() {
+    try {
+      const stations = await Station.find().sort({ created: 1 })
+      win.webContents.send('stations:get', JSON.stringify(stations))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add stations
+  ipcMain.on('stations:add', async (e, item) => {
+    try {
+      await Station.create(item)
+      sendStations()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete stations
+  ipcMain.on('stations:delete', async (e, id) => {
+    try {
+      await Station.findOneAndDelete({ _id: id })
+      sendStations()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit stations
+  ipcMain.on('stations:edit', async (e, item) => {
+    try {
+      const doc = await Station.findById(item._id);
+      doc.name = item.name;
+      await doc.save();
+      sendStations()
     } catch (error) {
       console.log(error)
     }

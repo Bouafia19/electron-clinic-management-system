@@ -10,7 +10,7 @@
         <v-list-item-avatar tile>
           <v-img           
             contain
-            src="./assets/icons/couleur/hospital.png"
+            src="./assets/icons/couleur/medical-history.png"
           >
           </v-img>
         </v-list-item-avatar>
@@ -123,6 +123,7 @@
           { title: 'Patients', icon: 'mdi-clipboard-account', to: '/patients' },
           { title: 'Chauffeurs', icon: 'mdi-badge-account-horizontal', to: '/drivers' },
           { title: 'Voitures', icon: 'mdi-car', to: '/vehicles' },
+          { title: 'Stations', icon: 'mdi-routes', to: '/stations' },
           { title: 'Missions', icon: 'mdi-ballot', to: '/missions' },
           { title: 'À propos', icon: 'mdi-information', to: '/about' },
         ],

@@ -320,12 +320,12 @@
                 :label="'Chauffeurs'"
                 item-value="_id"
                 item-text="raison"
-                v-model="CustomerInfo._id"
+                v-model="editedItem.driverId"
                 return-object
                 single-line
                 outlined
                 dense
-                @change="getCustomerInfo($event)"
+                
                 
               >
                 <template slot="selection" slot-scope="data">
@@ -368,12 +368,12 @@
                 :label="'Voitures'"
                 item-value="_id"
                 item-text="model"
-                v-model="CustomerInfo._id"
+                v-model="editedItem.vehiculeId"
                 return-object
                 single-line
                 outlined
                 dense
-                @change="getCustomerInfo($event)"
+                
                 
               >
                 <!-- <template slot="selection" slot-scope="data">
@@ -443,7 +443,7 @@
         <v-col>
           <v-data-table
             :headers="headers"
-            :items="missions"
+            :items="rides"
             :search="search"
             hide-default-footer
             sort-by=""
@@ -456,68 +456,8 @@
                 {{ items.pageStart }} - {{ items.pageStop }} {{ 'de' }} {{ items.itemsLength }} 
             </template>
 
-            <!-- <template v-for="header in headers" v-slot:[`header.${header.value}`]="{ header }">
-             
-               <thead>
-                <tr>
-                  <th v-for="header in headers" :key="header.text" class="sale-table">
-                    <div :key="header.text" v-if="SaleInfo.disabled == true">
-                      <div :key="header.text" v-if="header.text == 'Actions'">{{ }}</div>
-                      <div :key="header.text" v-else>
-                        <span class="sale-style">
-                          {{ $t(header.text) }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div :key="header.text" v-else>
-                      <div :key="header.text">
-                        <span class="sale-style">
-                          {{ $t(header.text) }}
-                        </span>
-                      </div>
-                    </div> 
-                  </th>
-                </tr>
-              </thead>
-             
-            </template> -->
-            <!-- <template v-slot:header="{ props: { headers } }">
-              <thead>
-                <tr>
-                  <th v-for="header in headers" :key="header.text" class="sale-table">
-                    <div :key="header.text" v-if="SaleInfo.disabled == true">
-                      <div :key="header.text" v-if="header.text == 'Actions'">{{ }}</div>
-                      <div :key="header.text" v-else>
-                        <span class="sale-style">
-                          {{ $t(header.text) }}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div :key="header.text" v-else>
-                      <div :key="header.text">
-                        <span class="sale-style">
-                          {{ $t(header.text) }}
-                        </span>
-                      </div>
-                    </div> 
-                  </th>
-                </tr>
-              </thead>
-            </template> -->
-            
-
             <template v-slot:[`item.date`]="{ item }">
               {{ formatDate(item.date) }}
-            </template>
-
-            <template v-slot:[`item.subTotal`]="{ item }">
-              {{ formatNumber(item.subTotal) }}
-            </template>
-
-            <template v-slot:[`item.price`]="{ item }">
-              {{ formatNumber(item.price) }}
             </template>
 
             <template v-slot:top>
@@ -541,7 +481,7 @@
                     class="shrink mx-4"
                 ></v-text-field>
 
-                <v-divider
+                <!-- <v-divider
                   class="mx-4"
                   inset
                   vertical
@@ -557,7 +497,7 @@
                   <v-icon large>
                     mdi-printer
                   </v-icon>
-                </v-btn>
+                </v-btn> -->
 
                 <v-spacer></v-spacer>
 
@@ -609,44 +549,41 @@
                               <v-col
                                 
                               >
-                                <v-select
-                                  v-model="e6"
-                                  :items="patients"
-                                  :menu-props="{ maxHeight: '400' }"
-                                  label="Patients"
-                                  item-value="_id"
-                                  item-text="fullName"
-                                  multiple
-                                  hint="Choisissez des stations"
-                                  persistent-hint
-                                  @change="log($event)"
-                                >
-                                   <template slot="selection" slot-scope="data">
-                                      {{ data.item.lastName }} {{ data.item.firstName }}
-                                  </template>
-                                  <template slot="item" slot-scope="data">
-                                      {{ data.item.lastName }} {{ data.item.firstName }}
-                                  </template>
-                                </v-select>
+                              <v-select
+                                v-model="e6"
+                                :items="patients"
+                                :menu-props="{ maxHeight: '400' }"
+                                
+                                multiple
+                                hint="Choisissez des Patients"
+                                persistent-hint
+
+                                label="Patients"
+                                item-value="_id"
+                                :item-text="item =>`${item.lastName} ${item.firstName}`"
+                                @change="setPatients($event)"
+                              >
+                                
+                              </v-select>
+
+                              <v-select
+                                v-model="e7"
+                                :items="stations"
+                                :menu-props="{ maxHeight: '400' }"
+                                
+                                multiple
+                                hint="Choisissez des Stations"
+                                persistent-hint
+
+                                label="Stations"
+                                item-value="_id"
+                                :item-text="'name'"
+                                @change="setStations($event)"
+                              >
+                                
+                              </v-select>
+                                
                               
-                                <!-- <v-select
-                                  v-model="e7"
-                                  :items="patients"
-                                  label="Select"
-                                  item-value="_Id"
-                                  item-text="lastName"
-                                  multiple
-                                  chips
-                                  hint="Choisissez des patients"
-                                  persistent-hint
-                                >
-                                  <template slot="selection" slot-scope="data">
-                                      {{ data.item.lastName }} {{ data.item.firstName }}
-                                  </template>
-                                  <template slot="item" slot-scope="data">
-                                      {{ data.item.lastName }} {{ data.item.firstName }}
-                                  </template>
-                                </v-select> -->
                               </v-col>
 
                               <!-- <v-col
@@ -782,8 +719,8 @@
               <v-row>
                 <v-col class="pb-0">
                   <v-text-field
-                    :value="`${formatNumber(SaleInfo.totalVehicles)}`"
-                    :label="'Vehicles'"
+                    :value="`${0}`"
+                    :label="'Total Patients'"
                     outlined
                     readonly
                     dark
@@ -794,8 +731,8 @@
               <v-row>
                 <v-col class="py-0 text-start">
                   <v-text-field
-                    :value="`${formatNumber(SaleInfo.totalUntaxedAmount)}`"
-                    :label="'UntaxedAmount'"
+                    :value="`${0}`"
+                    :label="'Total Distance'"
                     outlined
                     readonly
                     dark
@@ -806,8 +743,8 @@
               <v-row>
                 <v-col class="py-0">
                   <v-text-field
-                    :value="`${formatNumber(SaleInfo.totalPrice)}`"
-                    :label="'Total'"
+                    :value="`${0}`"
+                    :label="'Total Heure'"
                     outlined
                     readonly
                     dark
@@ -815,39 +752,6 @@
                 </v-col>
               </v-row>
 
-              <v-row>
-                <v-col class="py-0">
-                  <v-text-field
-                    v-model="SaleInfo.discount"
-                    :label="'Discount'"
-                    outlined
-                    dark
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
-              <v-row>
-                <v-col class="py-0">
-                  <v-text-field
-                    v-model="SaleInfo.payment"
-                    :label="'payment'"
-                    outlined
-                    dark
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
-              <!-- <v-row>
-                <v-col class="py-0">
-                  <v-text-field
-                    :value="`${formatNumber(editedItem.return)}`"
-                    :label="$t('Return')"
-                    outlined
-                    readonly
-                    dark
-                  ></v-text-field>
-                </v-col>
-              </v-row> -->
           </v-container>
         </v-col>
       
@@ -872,12 +776,12 @@
       dialog: false,
       dialogDelete: false,
       headers: [
-        // {
-        //   text: 'Products',
-        //   align: 'start',
-        //   value: 'productId.name',
-        // },
-        // { text: 'Description', value: "productId.designation" },
+        {
+          text: 'Stations',
+          align: 'start',
+          value: 'stationId',
+        },
+        { text: 'Patients', value: "patientId" },
         { text: 'heure départ', value: "" },
         { text: 'heure d\'arrivée', value: '' },
         { text: 'compteur départ', value: '' },
@@ -888,40 +792,23 @@
       e7: [],
       missions: [],
       patients: [],
-      SaleInfo: [],
-      CustomerInfo: [],
+      stations: [],   
       drivers: [],
       vehicles: [],
       companyInfo: [],
-      tax_value: '',
-      untaxed_value: '',
-      sub_total: '',
-      ancienAmount: '',
-      newAmount: '',
-      ancienTaxValue: '',
       confirmButton: false,
       pdfHeaders: [],
       date_of_mission: '',
       editedIndex: -1,
       editedItem: {
-        productId: '',
-        amount: 0,
-        price: 0,
-        disabled: false,
-        taxId: '',
-        untaxedAmount: 0,
-        Vehicles: 0,
-        subTotal: 0
+        patientId: '',
+        stationId: '',
+        
       },
       defaultItem: {
-        productId: '',
-        amount: 0,
-        price: 0,
-        disabled: false,
-        taxId: '',
-        untaxedAmount: 0,
-        Vehicles: 0,
-        subTotal: 0
+        patientId: '',
+        stationId: '',
+       
       },
     }),
 
@@ -942,14 +829,15 @@
         val || this.closeDelete()
       },
     },
-
     created() {
       this.getRouteId()
     },
-
     methods: {
-      log (e){
-        console.log(e)
+      setPatients(e){
+        this.editedItem.patientId = e
+      },
+      setStations(e){
+        this.editedItem.stationId = e
       },
       getBack () {
         this.$router.push({ path: `/missions`  });
@@ -957,7 +845,7 @@
       confirm () {
         var self = this;
         this.$swal({
-        title: "confirme Sale?",
+        title: "confirme Mission?",
         icon: "warning",
         showCancelButton: true,
         cancelButtonColor: '#FF5252',
@@ -988,21 +876,9 @@
           }
         })
       },
-      getBuyingPrice (value) {
-        this.editedItem.price = value.salePrice
-        this.editedItem.amount = 1
-      },
-      getCustomerInfo (value) {
-        this.CustomerInfo.raison = value.raison
-        this.CustomerInfo.street = value.street
-        this.CustomerInfo.city = value.city
-        this.CustomerInfo.state = value.state
-        this.CustomerInfo.country = value.country
-        this.CustomerInfo.zip = value.zip
-      },
-      generateReport () {
-          this.$refs.html2Pdf.generatePdf()
-      },
+      // generateReport () {
+      //     this.$refs.html2Pdf.generatePdf()
+      // },
       getRouteId() {
           this.id = this.$route.params.id,
           this.initialize()
@@ -1015,26 +891,17 @@
         return new Intl.NumberFormat('fr', { style: 'currency', currency: 'DZD' }).format(value)
       },
 
-      loadmissions() {
+      loadMissions() {
         ipcRenderer.send('missions:load', this.id),
         ipcRenderer.on('missions:get', (e, missions) => {
           this.missions = JSON.parse(missions)
-          
         })
       },
 
-      loadStockProducts() {
+      loadPatients() {
         ipcRenderer.send('patients:load'),
         ipcRenderer.on('patients:get', (e, patients) => {
           this.patients = JSON.parse(patients)
-        })
-      },
-
-      loadSaleInfo() {
-        ipcRenderer.send('saleInfo:load', this.id),
-        ipcRenderer.on('saleInfo:get', (e, saleInfo) => {
-          this.SaleInfo = JSON.parse(saleInfo)
-          this.CustomerInfo = this.SaleInfo.customerId
         })
       },
 
@@ -1045,37 +912,40 @@
         })
       },
 
-      loadCompany() {
-        ipcRenderer.send('companies:load'),
-        ipcRenderer.on('company:get', (e, companies) => {
-        companies = JSON.parse(companies)
-        this.companyInfo = companies[0]
-      })
-      },
-
-      loaddrivers () {
+      loadDrivers () {
         ipcRenderer.send('drivers:load'),
         ipcRenderer.on('drivers:get', (e, drivers) => {
           this.drivers = JSON.parse(drivers)
         })
       },
+
+      loadStations () {
+        ipcRenderer.send('stations:load'),
+        ipcRenderer.on('stations:get', (e, stations) => {
+          this.stations = JSON.parse(stations)
+        })
+      },
+
+      // loadRides() {
+      //   ipcRenderer.send('rides:load', this.id),
+      //   ipcRenderer.on('rides:get', (e, rides) => {
+      //     this.rides = JSON.parse(rides)
+      //   })
+      // },
       
       initialize () {
-        this.loadmissions()
-        this.loadStockProducts()
-        this.loadSaleInfo()
+        this.loadPatients()
+        this.loadMissions()
         this.loadVehicles()
-        this.loadCompany()
-        this.loaddrivers()
+        this.loadDrivers()
+        this.loadStations()
+        // this.loadRides()
       },
 
       editItem (item) {
         this.editedIndex = this.missions.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
-        this.ancienAmount = this.editedItem.amount
-        this.untaxed_value = this.editedItem.untaxedAmount
-        this.ancienTaxValue = this.editedItem.taxId.valueTax
       },
 
       deleteItem (item) {
@@ -1087,8 +957,6 @@
 
       deleteItemConfirm () {
         ipcRenderer.send('missions:delete', this.editedItem)
-        ipcRenderer.send('stock:plus', this.editedItem)
-        this.subtractionTotals ()
         this.closeDelete()
       },
 
@@ -1108,155 +976,13 @@
         })
       },
 
-      calculateVehicles (item) { 
-        this.editedItem.Vehicles = item.amount * item.price * ( item.taxId.valueTax / 100 )
-        this.editedItem.untaxedAmount = item.amount * item.price
-      },
-
-      calculateTotals (item) {
-        this.calculateVehicles (item)
-        this.editedItem.subTotal = item.amount * item.price + this.editedItem.Vehicles
-        this.SaleInfo.totalPrice = this.SaleInfo.totalPrice + this.editedItem.subTotal
-        this.SaleInfo.totalUntaxedAmount = this.SaleInfo.totalUntaxedAmount + this.editedItem.untaxedAmount
-        this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles + this.editedItem.Vehicles
-
-        ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-        
-      },
-
-      subtractionTotals () {
-        this.SaleInfo.totalPrice = this.SaleInfo.totalPrice - this.editedItem.subTotal
-        this.SaleInfo.totalUntaxedAmount = this.SaleInfo.totalUntaxedAmount - this.editedItem.untaxedAmount
-        this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles - this.editedItem.Vehicles
-      
-        ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-      },
-
-      updateTotals (item) {
-        // calculate untaxed value
-        this.untaxed_value = item.amount * item.price
-        //calculate the defrence 
-        let deffTaxValue;
-        let deffTotal;
-        let tax_value;
-        let subTotal;
-          if ( this.untaxed_value == item.untaxedAmount ) {
-            if (this.ancienTaxValue == item.taxId.valueTax) {
-              ipcRenderer.send('missions:edit', item)
-            } else if (this.ancienTaxValue < item.taxId.valueTax) {
-              deffTaxValue = item.taxId.valueTax - this.ancienTaxValue
-              //calculate tax value for the defrence
-              tax_value = item.untaxedAmount * ( deffTaxValue / 100 )
-              subTotal = item.untaxedAmount + tax_value
-              //update totals value
-              item.subTotal = item.subTotal + subTotal
-              this.SaleInfo.totalPrice = this.SaleInfo.totalPrice + subTotal
-              this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles + tax_value
-              
-              ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-              ipcRenderer.send('missions:edit', item)
-
-            } else if (this.ancienTaxValue > item.taxId.valueTax) {
-              deffTaxValue = this.ancienTaxValue - item.taxId.valueTax
-              //calculate tax value for the defrence
-              tax_value = item.untaxedAmount * ( deffTaxValue / 100 )
-              subTotal = item.untaxedAmount + tax_value
-
-              //update totals value
-              item.subTotal = item.subTotal - subTotal
-              this.SaleInfo.totalPrice = this.SaleInfo.totalPrice - subTotal
-              this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles - tax_value
-
-              ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-              ipcRenderer.send('missions:edit', item)
-
-            }
-            
-          } else if ( this.untaxed_value > item.untaxedAmount ) {
-            //calculate the defrence betwen the new and the old untaxed value
-            deffTotal = this.untaxed_value - item.untaxedAmount
-
-            //calculate tax value for the defrence
-            tax_value = deffTotal * ( item.taxId.valueTax / 100 )
-            subTotal = deffTotal + tax_value
-
-            //update totals value
-            item.subTotal = item.subTotal + subTotal
-            this.SaleInfo.totalPrice = this.SaleInfo.totalPrice + subTotal
-            this.SaleInfo.totalUntaxedAmount = this.SaleInfo.totalUntaxedAmount + deffTotal
-            this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles + tax_value
-
-            //
-            ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-            item.untaxedAmount = this.untaxed_value
-            ipcRenderer.send('missions:edit', item)
-
-          } else if ( this.untaxed_value < item.untaxedAmount ) {
-            deffTotal = item.untaxedAmount - this.untaxed_value
-            
-            //calculate tax value for the defrence
-            tax_value = deffTotal * ( item.taxId.valueTax / 100 )
-            subTotal = deffTotal + tax_value
-
-            //update totals value
-            item.subTotal = item.subTotal - subTotal
-            this.SaleInfo.totalPrice = this.SaleInfo.totalPrice - subTotal
-            this.SaleInfo.totalUntaxedAmount = this.SaleInfo.totalUntaxedAmount - deffTotal
-            this.SaleInfo.totalVehicles = this.SaleInfo.totalVehicles - tax_value
-
-            ipcRenderer.send('saleTotals:edit', this.SaleInfo)
-            item.untaxedAmount = this.untaxed_value
-            ipcRenderer.send('missions:edit', item)
-          }
-      },
-
-      updateStockAmount(item) {
-        let stockItem = {
-          productId: item.productId,
-          amount: ''
-        }
-        let quantity;
-          if ( this.ancienAmount == this.newAmount ) {
-            quantity = 0;
-          } else if ( this.ancienAmount > this.newAmount ) {
-            quantity = this.ancienAmount - this.newAmount
-            stockItem = Object.assign(stockItem, { amount: quantity })
-            ipcRenderer.send('stock:plus', stockItem)
-          } else if ( this.ancienAmount < this.newAmount ) {
-            quantity = this.newAmount - this.ancienAmount
-            stockItem = Object.assign(stockItem, { amount: quantity })
-            ipcRenderer.send('stock:minus', stockItem)
-          }
-      },
-
-      createProductSale (item) { 
-          ipcRenderer.send('missions:add', item)  
-      },
-
-      removeAmountFromStock () {
-        ipcRenderer.send('stock:minus', this.editedItem)
-      },
-
       save () {
-
-        this.editedItem.saleId = this.id
-        if (this.editedItem.taxId == "") {
-          let defaultTax = this.Vehicles.find(item => item.valueTax == 0)
-          this.editedItem.taxId = defaultTax
-        }
+        this.close()
         if (this.editedIndex > -1) {
-          this.newAmount = this.editedItem.amount
-          this.updateStockAmount(this.editedItem)
-          this.updateTotals(this.editedItem)
-          // ipcRenderer.send('purchaseTotals:edit', this.PurchaseInfo)
-        } else { 
-        // console.log('Object', this.editedItem)
-        this.calculateTotals (this.editedItem),
-        this.createProductSale (this.editedItem),
-        this.removeAmountFromStock ()
-        // ipcRenderer.send('saleTotals:edit', this.SaleInfo)
+          ipcRenderer.send('rides:edit', this.editedItem)
+        } else {
+          ipcRenderer.send('rides:add', this.editedItem)
         }
-        // this.initialize()
         this.close()
       },
     },
