@@ -616,7 +616,7 @@
                               
                               <v-col>
                               <v-select
-                                v-model="e6"
+                                v-model="editedItem.patientId"
                                 :items="patients"
                                 :menu-props="{ maxHeight: '400' }"
                                 
@@ -628,13 +628,13 @@
                                 label="Patients"
                                 item-value="_id"
                                 :item-text="item =>`${item.lastName} ${item.firstName}`"
-                                @change="setPatients($event)"
+                                
                               >
                                 
                               </v-select>
 
                               <v-select
-                                v-model="e7"
+                                v-model="editedItem.stationId"
                                 :items="stations"
                                 :menu-props="{ maxHeight: '400' }"
                                 
@@ -646,7 +646,7 @@
                                 label="Stations"
                                 item-value="_id"
                                 :item-text="'name'"
-                                @change="setStations($event)"
+                                
                               >
                                 
                               </v-select>
@@ -913,8 +913,6 @@
         { text: 'distance parcourue', value: 'subTotalDistance' },
         { text: 'effacer', value: 'actions', sortable: false },
       ],
-      e6: [],
-      e7: [],
       missions: [],
       patients: [],
       stations: [],   
@@ -927,8 +925,8 @@
       date_of_mission: '',
       editedIndex: -1,
       editedItem: {
-        missionId: '',
-        patientId: '',
+        missionId: [],
+        patientId: [],
         stationId: '',
         departureTime: '',
         arrivingTime: '',
@@ -1158,6 +1156,7 @@
           ipcRenderer.send('rides:edit', this.editedItem)
         } else {
           ipcRenderer.send('rides:add', this.editedItem)
+
         }
         this.close()
       },
