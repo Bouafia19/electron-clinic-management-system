@@ -18,6 +18,25 @@ const MissionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  confirmed: {
+    type: Boolean,
+    default: false
+  },
+  totalPatients: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  totalDistances: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  totalHours: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   created: {
     type: Date,
     default: Date.now,

@@ -154,6 +154,7 @@ import {ipcRenderer} from "electron";
           sortable: false,
           value: 'name',
         },
+        { text: 'Date creation', value: 'created' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       stations: [],

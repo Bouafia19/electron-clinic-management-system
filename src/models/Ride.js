@@ -26,6 +26,14 @@ const RideSchema = new mongoose.Schema({
   arrivalCounter: {
     type: Number,
   },
+  subTotalDistance: {
+    type: Number,
+    min: 0
+  },
+  subTotalHour: {
+    type: Number,
+    min: 0
+  },
   created: {
     type: Date,
     default: Date.now,

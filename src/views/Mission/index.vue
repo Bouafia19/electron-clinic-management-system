@@ -142,6 +142,31 @@
                       </template> -->
                     </v-select>
 
+                    <v-menu
+                      v-model="date_of_mission"
+                      :close-on-content-click="false"
+                      max-width="290"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          :value="computedDateFormattedDate"
+                          prepend-icon="mdi-calendar"
+                          clearable
+                          :label="'Date mission'"
+                          readonly
+                          outlined
+                          dense
+                          v-bind="attrs"
+                          v-on="on"
+                          @click:clear="editedItem.date = null"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        v-model="editedItem.date"
+                        @change="date_of_mission = false"
+                      ></v-date-picker>
+                    </v-menu>
+
 
 
                   </v-col>
@@ -197,6 +222,17 @@
           mdi-delete
         </v-icon>
       </template>
+
+      <template v-slot:item.lock="{ item }"> 
+        <v-icon
+          small
+          class="mr-2"
+          color="black"
+          v-show="item.confirmed"
+        >
+          mdi-lock
+        </v-icon> 
+      </template>  
       <template v-slot:no-data>
         <v-btn
           color="next"
@@ -223,6 +259,12 @@
       search: '',
       image: undefined,
       headers: [
+        { text: '',
+          align: 'start',
+          value: 'lock', 
+          sortable: false,
+          width: '10px'
+        },
         {
           text: 'Code',
           align: 'start',
@@ -236,6 +278,7 @@
       drivers: [],
       missions: [],
       vehicles: [],
+      date_of_mission: false,
       editedIndex: -1,
       editedItem: {
         code: '',
@@ -250,6 +293,9 @@
     }),
 
     computed: {
+      computedDateFormattedDate () {
+        return this.editedItem.date ? moment(this.editedItem.date).locale('fr').format('dddd, MMMM Do YYYY') : ''
+      },
       computedDateFormattedExperationDate () {
         return this.editedItem.experationDate ? moment(this.editedItem.experationDate).format('dddd, MMMM Do YYYY') : ''
       },

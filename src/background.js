@@ -42,6 +42,7 @@ async function createWindow() {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
+    win.setMenu(null)
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
@@ -327,6 +328,24 @@ async function createWindow() {
     try {
       const missionInfo = await Mission.findOne({ _id: id}).populate("driverId").populate("vehiculeId")
       win.webContents.send('missionInfo:get', JSON.stringify(missionInfo))
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit missionInfo
+  ipcMain.on('missionInfo:edit', async (e, item) => {
+    try {
+      const doc = await Mission.findOne({ _id: item._id });
+      doc.vehiculeId = item.vehiculeId;
+      doc.driverId = item.driverId;
+      doc.date = item.date;
+      doc.confirmed = item.confirmed;
+      doc.totalDistances = item.totalDistances;
+      doc.totalHours = item.totalHours;
+
+      await doc.save();
+      sendMissions()
     } catch (error) {
       console.log(error)
     }

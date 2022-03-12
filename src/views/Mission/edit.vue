@@ -285,6 +285,7 @@
             {{ 'Annuler' }}
           </v-btn>
           <v-btn
+            v-show="!missionInfo.confirmed"
             color="success"
             @click="confirm"
           >
@@ -407,6 +408,30 @@
           cols="12"
           sm="6"
           md="3">
+          <!-- <v-menu
+            v-model="date_of_mission"
+            :close-on-content-click="false"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                :value="computedDateFormattedDate"
+                prepend-icon="mdi-calendar"
+                clearable
+                :label="'Date mission'"
+                readonly
+                outlined
+                dense
+                v-bind="attrs"
+                v-on="on"
+                @click:clear="missionInfo.date = null"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="missionInfo.date"
+              @change="date_of_mission = false"
+            ></v-date-picker>
+          </v-menu> -->
           <v-menu
             v-model="date_of_mission"
             :close-on-content-click="false"
@@ -448,7 +473,7 @@
             :search="search"
             hide-default-footer
             sort-by=""
-            
+            hide-default-header
             :footer-props="{
               'items-per-page-text': 'Lignes par page :',             
             }"
@@ -471,6 +496,35 @@
               <div v-for="item in item.patientId" :key="item._id">
                 {{ item.lastName }} {{ item.firstName }}
               </div>
+            </template>
+
+            <!-- <template v-slot:[`item.subTotalHour`]="{ item }">
+              {{ formatHeure(item.subTotalHour) }}
+            </template> -->
+
+            <template v-slot:header="{ props: { headers } }">
+              <thead>
+                <tr>
+                  <th v-for="header in headers" :key="header.text" class="sale-table">
+                    <div :key="header.text" v-if="missionInfo.confirmed == true">
+                      <div :key="header.text" v-if="header.text == 'effacer'">{{ }}</div>
+                      <div :key="header.text" v-else>
+                        <span>
+                          {{ header.text }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div :key="header.text" v-else>
+                      <div :key="header.text">
+                        <span class="sale-table">
+                          {{ header.text }}
+                        </span>
+                      </div>
+                    </div> 
+                  </th>
+                </tr>
+              </thead>
             </template>
 
             <template v-slot:top>
@@ -526,6 +580,7 @@
                       class="mb-2"
                       v-bind="attrs"
                       v-on="on"
+                      v-show="!missionInfo.confirmed"
                       
                     >
                       <v-icon large>
@@ -730,11 +785,37 @@
               <v-icon
                 small
                 color="red"
-                
+                v-show="!missionInfo.confirmed"
                 @click="deleteItem(item)"
               >
                 mdi-delete
               </v-icon>
+            </template>
+
+            <template v-slot:[`item.subTotalHour`]="{ item }">
+              <v-chip
+                :color="getColor(item)"
+                dark
+              >
+                  {{ formatHeure(item.subTotalHour) }}
+              </v-chip>
+            </template>
+
+            <template v-slot:[`item.subTotalDistance`]="{ item }">
+              <v-chip
+                :color="getColor(item)"
+                dark
+              >
+                  {{ formatNumber(item.subTotalDistance) }}
+              </v-chip>
+            </template>
+
+            <template v-slot:[`item.departureCounter`]="{ item }">
+                  {{ formatNumber(item.departureCounter) }}
+            </template>
+
+            <template v-slot:[`item.arrivalCounter`]="{ item }">
+                  {{ formatNumber(item.arrivalCounter) }}
             </template>
 
             <template v-slot:no-data>
@@ -751,9 +832,8 @@
           </v-data-table>
         </v-col>
 
-        
-        <v-col cols="2" style="background-color: #00366f; border-radius: 5px;" class="mt-3 pa-0">
-          <v-container>
+        <v-card style="background-color: #00366f; border-radius: 5px;" class="mt-3 pa-0">
+          <v-container >
               
               <v-row>
                 <v-col class="pb-0">
@@ -770,8 +850,8 @@
               <v-row>
                 <v-col class="py-0 text-start">
                   <v-text-field
-                    :value="`${0}`"
-                    :label="'Total Distance'"
+                    :value="formatNumber(missionInfo.totalDistances)"
+                    :label="'Distance totale'"
                     outlined
                     readonly
                     dark
@@ -782,8 +862,8 @@
               <v-row>
                 <v-col class="py-0">
                   <v-text-field
-                    :value="`${0}`"
-                    :label="'Total Heure'"
+                    :value="`${formatHeure(missionInfo.totalHours)}`"
+                    :label="'Totale des heures'"
                     outlined
                     readonly
                     dark
@@ -792,7 +872,7 @@
               </v-row>
 
           </v-container>
-        </v-col>
+        </v-card>
       
       </v-row>
     </v-container>
@@ -813,7 +893,7 @@
       // time: null,
       menu2: false,
       menu4: false,
-      modal2: false,
+     
       id: '',
       search: '',
       dialog: false,
@@ -827,8 +907,10 @@
         { text: 'patients', value: "patientsItems" },
         { text: 'heure départ', value: "departureTime" },
         { text: 'heure d\'arrivée', value: 'arrivingTime' },
+        { text: 'nombre d\'heure', value: 'subTotalHour' },
         { text: 'compteur départ', value: 'departureCounter' },
         { text: 'compteur d\'arrivée', value: 'arrivalCounter' },
+        { text: 'distance parcourue', value: 'subTotalDistance' },
         { text: 'effacer', value: 'actions', sortable: false },
       ],
       e6: [],
@@ -852,6 +934,8 @@
         arrivingTime: '',
         departureCounter: '',
         arrivalCounter: '',
+        subTotalDistance: 0,
+        subTotalHour: 0,
       },
       defaultItem: {
         missionId: '',
@@ -861,11 +945,15 @@
         arrivingTime: '',
         departureCounter: '',
         arrivalCounter: '',
+        subTotalDistance: 0,
+        subTotalHour: 0,
       },
     }),
 
     computed: {
       computedDateFormattedDate () {
+        console.log('this.missionInfo.date', this.missionInfo.date)
+        console.log('Format', this.missionInfo.date ? moment(this.missionInfo.date).locale('fr').format('dddd, MMMM Do YYYY') : '')
         return this.missionInfo.date ? moment(this.missionInfo.date).locale('fr').format('dddd, MMMM Do YYYY') : ''
       },
       formTitle () {
@@ -885,6 +973,12 @@
       this.getRouteId()
     },
     methods: {
+      formatNumber(value) {
+        return new Intl.NumberFormat('fr',{ style: 'unit', unit: 'kilometer',}).format(value)
+      },
+      getColor (valeur) {
+        return 'green'
+      },
       setPatients(e){
         this.editedItem.patientId = e
       },
@@ -897,7 +991,7 @@
       confirm () {
         var self = this;
         this.$swal({
-        title: "confirme Mission?",
+        title: "voulez-vous confirmer cette mission ?",
         icon: "warning",
         showCancelButton: true,
         cancelButtonColor: '#FF5252',
@@ -905,26 +999,16 @@
         }).then((result) => {
           if (result.isConfirmed) {
 
-            if (self.SaleInfo.totalPrice > self.SaleInfo.discount) {
-              self.SaleInfo.totalPrice = self.SaleInfo.totalPrice - self.SaleInfo.discount
-              self.SaleInfo.disabled = true
-              self.SaleInfo.date = Date.now()
-              ipcRenderer.send('saleTotals:edit', self.SaleInfo)
+              self.missionInfo.confirmed = true
+              ipcRenderer.send('missionInfo:edit', self.missionInfo)
               self.$swal({
               position: 'top-end',
-              title: "Sale confirmed!",
+              title: "Mission confirmée !",
               icon: "success",
               showConfirmButton: false,
               })
               self.$router.push({ path: `/missions`  });
-            } else {
-              self.$swal({
-              
-              title: "Total Sale is less then discount!",
-              icon: "error",
-              button: "Done!"
-              })
-            }
+           
           }
         })
       },
@@ -939,17 +1023,11 @@
         return moment(value).locale('fr').format("MMMM DD YYYY, h:mm:ss a")
       },
 
-      formatNumber(value) {
-        return new Intl.NumberFormat('fr', { style: 'currency', currency: 'DZD' }).format(value)
+      formatHeure(value) {
+        var hours=parseInt(value/60)+":"+ value%60;
+        return hours
       },
-
-      // loadMissions() {
-      //   ipcRenderer.send('missions:load', this.id),
-      //   ipcRenderer.on('missions:get', (e, missions) => {
-      //     this.missions = JSON.parse(missions)
-      //   })
-      // },
-
+      
       loadPatients() {
         ipcRenderer.send('patients:load'),
         ipcRenderer.on('patients:get', (e, patients) => {
@@ -989,6 +1067,7 @@
         ipcRenderer.send('missionInfo:load', this.id),
         ipcRenderer.on('missionInfo:get', (e, missionInfo) => {
           this.missionInfo = JSON.parse(missionInfo)
+          console.log('this.missionInfo', this.missionInfo)
         })
       },
       
@@ -1016,6 +1095,9 @@
       },
 
       deleteItemConfirm () {
+        this.missionInfo.totalDistances = this.missionInfo.totalDistances - this.editedItem.subTotalDistance
+        this.missionInfo.totalHours = this.missionInfo.totalHours - this.editedItem.subTotalHour
+        ipcRenderer.send('missionInfo:edit', this.missionInfo)
         ipcRenderer.send('rides:delete', this.editedItem)
         this.closeDelete()
       },
@@ -1038,7 +1120,40 @@
 
       save () {
         this.editedItem.missionId = this.id
-        this.close()
+        this.editedItem.subTotalDistance = this.editedItem.arrivalCounter - this.editedItem.departureCounter 
+      
+          function getAct(data, s) {
+            var startTime = data[10];
+            var endTime = data[11];
+
+            var s = startTime.split(':');
+            var e = endTime.split(':');
+
+            var end = parseInt(e[0])* 60+ parseInt(e[1]);
+            var start = parseInt(s[0])*60 + parseInt(s[1]);
+
+            var elapsedMs = end - start;
+            
+            return elapsedMs ;
+          }
+          var data=[];
+
+          data[11] = this.editedItem.arrivingTime;
+          data[10] = this.editedItem.departureTime;
+
+          var minutes=getAct(data); 
+          console.log('minutes', minutes)
+
+          // var hours=parseInt(minutes/60)+":"+ minutes%60;
+    
+          this.editedItem.subTotalHour = minutes
+
+          // this.missionInfo.totalPatients = this.missionInfo.totalPatients + 
+          this.missionInfo.totalDistances = this.missionInfo.totalDistances + this.editedItem.subTotalDistance
+          this.missionInfo.totalHours = this.missionInfo.totalHours + minutes
+
+          ipcRenderer.send('missionInfo:edit', this.missionInfo)
+
         if (this.editedIndex > -1) {
           ipcRenderer.send('rides:edit', this.editedItem)
         } else {

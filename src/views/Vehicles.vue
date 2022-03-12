@@ -380,6 +380,11 @@
           mdi-delete
         </v-icon>
       </template>
+
+      <template v-slot:[`item.odometer`]="{ item }">
+        {{ formatNumber(item.odometer) }}
+      </template>
+
       <template v-slot:no-data>
         <v-btn
           color="next"
@@ -468,6 +473,9 @@
     },
 
     methods: {
+      formatNumber(value) {
+        return new Intl.NumberFormat('fr',{ style: 'unit', unit: 'kilometer',}).format(value)
+      },
       formatDate(value) {
         return moment(value).locale('fr').format("MMMM DD YYYY")
       },
