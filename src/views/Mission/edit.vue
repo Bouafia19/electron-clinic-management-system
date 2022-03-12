@@ -494,7 +494,7 @@
 
             <template v-slot:[`item.patientsItems`]="{ item }">
               <div v-for="item in item.patientId" :key="item._id">
-                {{ item.lastName }} {{ item.firstName }}
+                - {{ item.lastName }} {{ item.firstName }}
               </div>
             </template>
 
