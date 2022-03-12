@@ -1132,7 +1132,7 @@
             var end = parseInt(e[0])* 60+ parseInt(e[1]);
             var start = parseInt(s[0])*60 + parseInt(s[1]);
 
-            var elapsedMs = end - start;
+            var elapsedMs = Math.abs(end - start);
             
             return elapsedMs ;
           }
