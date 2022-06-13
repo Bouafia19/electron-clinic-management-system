@@ -12,6 +12,7 @@ const User = require('./models/User')
 const Mission = require('./models/Mission')
 const Ride = require('./models/Ride')
 const Station = require('./models/Station')
+const Schedule = require('./models/Schedule')
 const bcrypt =require('bcrypt')
 
 // Connect to database
@@ -453,6 +454,59 @@ async function createWindow() {
       console.log(error)
     }
   })
+
+   // Load schedule
+  ipcMain.on('schedule:load', sendschedule)
+
+  // Send schedule items
+  async function sendschedule() {
+    try {
+      const schedule = await Schedule.find().sort({ created: 1 }).populate("patientId").populate("driverId")
+      win.webContents.send('schedule:get', JSON.stringify(schedule))
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // Add schedule
+  ipcMain.on('schedule:add', async (e, item) => {
+    try {
+      await Schedule.create(item)
+      sendschedule()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Delete schedule
+  ipcMain.on('schedule:delete', async (e, id) => {
+    try {
+      await Schedule.findOneAndDelete({ _id: id })
+      sendschedule()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  // Edit schedule
+  ipcMain.on('schedule:edit', async (e, item) => {
+    try {
+      const doc = await Schedule.findById(item._id);
+      doc.patientId = item.patientId;
+      doc.driverId = item.driverId;
+      doc.period = item.period;
+      doc.name = item.name;
+      doc.start = item.start;
+      doc.end = item.end;
+      doc.color = item.color;
+      doc.timed = item.timed;
+      await doc.save();
+      sendschedule()
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
 }
 
 // Quit when all windows are closed.

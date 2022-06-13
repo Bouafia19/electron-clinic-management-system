@@ -449,6 +449,7 @@
                 v-bind="attrs"
                 v-on="on"
                 @click:clear="missionInfo.date = null"
+                @click="missionInfo.date = null"
               ></v-text-field>
             </template>
             <v-date-picker
@@ -832,7 +833,7 @@
           </v-data-table>
         </v-col>
 
-        <v-card style="background-color: #00366f; border-radius: 5px;" class="mt-3 pa-0">
+        <v-card style="background-color: #00366f; border-radius: 5px;max-height: 250px" class="mt-3 pa-0">
           <v-container >
               
               <v-row>

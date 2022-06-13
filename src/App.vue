@@ -24,7 +24,7 @@
       </v-list-item>
 
       <v-divider></v-divider>
-
+      
       <v-list
         dense
         nav
@@ -33,7 +33,6 @@
           v-for="item in items"
           :key="item.title"
           :to="item.to"
-          link
         >
           <v-list-item-avatar>
             <v-icon>{{ item.icon }}</v-icon>
@@ -120,6 +119,10 @@
       items: [
           { title: 'Accueil', icon: 'mdi-home', to: '/' },
           { title: 'Tableau de bord', icon: 'mdi-view-dashboard', to: '' },
+          { title: 'Planifications', 
+            icon: 'mdi-book-clock', 
+            to: '/schedules', 
+          },
           { title: 'Patients', icon: 'mdi-clipboard-account', to: '/patients' },
           { title: 'Chauffeurs', icon: 'mdi-badge-account-horizontal', to: '/drivers' },
           { title: 'Voitures', icon: 'mdi-car', to: '/vehicles' },
@@ -143,3 +146,7 @@
 
   }
 </script>
+
+<style scoped>
+  
+</style>

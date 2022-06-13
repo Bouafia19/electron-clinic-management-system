@@ -56,6 +56,18 @@ const routes = [
     path: '/stations',
     component: () => import('../views/Stations.vue')
   },
+  {
+    path: '/schedules',
+    component: () => import('../views/Schedule/index.vue')
+  },
+  {
+    path: '/schedule/:id/edit',
+    component: () => import('../views/Schedule/edit.vue')
+  },
+  {
+    path: '/schedule/new',
+    component: () => import('../views/Schedule/new.vue')
+  },
 ]
 
 const router = new VueRouter({
