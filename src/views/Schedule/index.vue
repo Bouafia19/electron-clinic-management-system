@@ -99,6 +99,7 @@
                                     v-bind="attrs"
                                     v-on="on"
                                     @click:clear="editedItem.date = null"
+                                    @click="editedItem.date = null"
                                   ></v-text-field>
                                 </template>
                                 <v-date-picker
@@ -110,7 +111,7 @@
                               <v-select
                                 :items="teams"
                                 :label="'Equipes'"
-                                item-value="_id"
+                                item-value="id"
                                 item-text="name"
                                 v-model="editedItem.teamId"
                                 return-object
@@ -318,6 +319,7 @@
   import moment from 'moment'
   export default {
     data: () => ({
+      editedIndex: -1,
       date_of_mission: false,
       dialog: false,
       focus: '',
@@ -368,53 +370,57 @@
     },
     methods: {
       updateEvent (item) {
-        console.log('item', item)
-        
         this.editedIndex = this.events.indexOf(item)
         this.editedItem = Object.assign({}, item)
+        this.editedItem.teamId = this.teams.find(i => i.name === item.team).id
+        this.editedItem.periodId = this.period.find(i => i.label === item.period).id
+        this.editedItem.date = this.editedItem.date.substr(0, 10);
         this.dialog = true
       },
       deleteEvent (id) {
-        console.log('id', id)
+        ipcRenderer.send('schedule:delete', id)
+        this.selectedOpen = false
       },
       save () {
-        let first, second, color, label
-        switch(this.editedItem.periodId) {
-          case 1:
-            first = new Date(`${this.editedItem.date}T04:00:00`)
-            second = new Date(`${this.editedItem.date}T08:00:00`)
-            break;
-          case 2:
-            first = new Date(`${this.editedItem.date}T08:00:00`)
-            second = new Date(`${this.editedItem.date}T12:00:00`)
-            break;
-          case 3:
-            first = new Date(`${this.editedItem.date}T13:00:00`)
-            second = new Date(`${this.editedItem.date}T17:00:00`)
-        }
+          
+          let first, second, color, label
+          switch(this.editedItem.periodId) {
+            case 1:
+              first = new Date(`${this.editedItem.date}T04:00:00`)
+              second = new Date(`${this.editedItem.date}T08:00:00`)
+              break;
+            case 2:
+              first = new Date(`${this.editedItem.date}T08:00:00`)
+              second = new Date(`${this.editedItem.date}T12:00:00`)
+              break;
+            case 3:
+              first = new Date(`${this.editedItem.date}T13:00:00`)
+              second = new Date(`${this.editedItem.date}T17:00:00`)
+          }
 
-        switch(this.editedItem.teamId.id) {
-          case 1:
-            color = '#008B8B'
-            break;
-          case 2:
-            color = '#DC143C'
-            break;
-        }
+          switch(this.editedItem.teamId.id) {
+            case 1:
+              color = '#008B8B'
+              break;
+            case 2:
+              color = '#DC143C'
+              break;
+          }
 
-        switch(this.editedItem.periodId) {
-          case 1:
-            label = '03:00 - 07:00'
-            break;
-          case 2:
-            label = '07:00 - 11:00'
-            break;
-          case 3:
-            label = '12:00 - 16:00'
-        }
-        
-        
-        let item = {
+          switch(this.editedItem.periodId) {
+            case 1:
+              label = '03:00 - 07:00'
+              break;
+            case 2:
+              label = '07:00 - 11:00'
+              break;
+            case 3:
+              label = '12:00 - 16:00'
+          }
+         
+          let item = {
+            _id: this.editedItem._id,
+            date: new Date(`${this.editedItem.date}`), 
             patientId: this.editedItem.patientId,
             driverId: this.editedItem.driverId._id,
             period: label,
@@ -424,8 +430,14 @@
             color: color,
             timed: true,
           }
-        // console.log('events', item)
-        ipcRenderer.send('schedule:add', item)
+          
+          if (this.editedIndex > -1) {
+            
+            ipcRenderer.send('schedule:edit', item)
+          } else {
+            ipcRenderer.send('schedule:add', item)
+          }
+
         this.close()
       },
       close () {

@@ -492,10 +492,11 @@ async function createWindow() {
   ipcMain.on('schedule:edit', async (e, item) => {
     try {
       const doc = await Schedule.findById(item._id);
+      doc.date = item.date;
       doc.patientId = item.patientId;
       doc.driverId = item.driverId;
       doc.period = item.period;
-      doc.name = item.name;
+      doc.team = item.team;
       doc.start = item.start;
       doc.end = item.end;
       doc.color = item.color;

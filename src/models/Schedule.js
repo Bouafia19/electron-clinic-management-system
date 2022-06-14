@@ -10,6 +10,9 @@ const ScheduleSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'Patient'
   }],
+  date: {
+    type: Date,
+  },
   period: {
     type: String,
   },
