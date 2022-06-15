@@ -52,7 +52,8 @@
                       color="grey darken-2"
                       
                       v-bind="attrs"
-                      v-on="on"  
+                      v-on="on"
+                      @click="resetEvent"  
                     >
                       {{ 'Nouveau' }}
                     </v-btn>
@@ -174,6 +175,7 @@
                                   :value="n.id"
                                   color="#F50057"
                                   
+                                  
                                 ></v-radio>
                               </v-radio-group>
                               
@@ -261,16 +263,15 @@
                 offset-x
                 >
                 <v-card
-                    color="grey lighten-4"
+                    
                     min-width="350px"
                     flat
                 >
                     <v-toolbar
-                    :color="selectedEvent.color"
-                    dark
+                      color="grey lighten-4"
                     >
                     
-                    <v-toolbar-title v-html="selectedEvent.period + ' / ' + selectedEvent.team"></v-toolbar-title>
+                    <v-toolbar-title :style="{color:selectedEvent.color}" v-html="selectedEvent.period + ' / ' + selectedEvent.team"></v-toolbar-title>
                     <v-spacer></v-spacer>
                     <v-btn icon color="next" @click="updateEvent(selectedEvent)">
                         <v-icon size="20">mdi-pencil</v-icon>
@@ -282,13 +283,13 @@
                     <v-card-text>
                       <v-row>
                         <v-col>
-                          <h3 style="color:#00366f">Chauffeur</h3>
+                          <h3 :style="{color:selectedEvent.color}">Chauffeur</h3>
                           <div v-if=" selectedEvent.driverId != null">
                             {{ selectedEvent.driverId.lastName + ' ' + selectedEvent.driverId.firstName }} 
                           </div>
                         </v-col>
                         <v-col>
-                          <h3 style="color:#00366f">Patient</h3>
+                          <h3 :style="{color:selectedEvent.color}">Patient</h3>
                           <div v-if=" selectedEvent.patientId != null">
                             <div v-for="i in selectedEvent.patientId" :key="i._id">
                               {{ '- ' + i.lastName + ' ' + i.firstName }} 
@@ -369,11 +370,14 @@
       this.initialize()
     },
     methods: {
+      resetEvent () {
+        this.editedItem = Object.assign({}, {})
+      },
       updateEvent (item) {
         this.editedIndex = this.events.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.editedItem.teamId = this.teams.find(i => i.name === item.team).id
-        this.editedItem.periodId = this.period.find(i => i.label === item.period).id
+        this.editedItem.teamId = this.teams.find(i => i.name === item.team)
+        this.editedItem.periodId = this.period.find(i => i.label === item.period)
         this.editedItem.date = this.editedItem.date.substr(0, 10);
         this.dialog = true
       },
@@ -388,24 +392,27 @@
             case 1:
               first = new Date(`${this.editedItem.date}T04:00:00`)
               second = new Date(`${this.editedItem.date}T08:00:00`)
+              color = '#008B8B'
               break;
             case 2:
               first = new Date(`${this.editedItem.date}T08:00:00`)
               second = new Date(`${this.editedItem.date}T12:00:00`)
+              color = '#4682B4'
               break;
             case 3:
               first = new Date(`${this.editedItem.date}T13:00:00`)
               second = new Date(`${this.editedItem.date}T17:00:00`)
+              color = '#4B0082'
           }
 
-          switch(this.editedItem.teamId.id) {
-            case 1:
-              color = '#008B8B'
-              break;
-            case 2:
-              color = '#DC143C'
-              break;
-          }
+          // switch(this.editedItem.teamId.id) {
+          //   case 1:
+          //     color = '#008B8B'
+          //     break;
+          //   case 2:
+          //     color = '#DC143C'
+          //     break;
+          // }
 
           switch(this.editedItem.periodId) {
             case 1:
@@ -419,7 +426,6 @@
           }
          
           let item = {
-            _id: this.editedItem._id,
             date: new Date(`${this.editedItem.date}`), 
             patientId: this.editedItem.patientId,
             driverId: this.editedItem.driverId._id,
@@ -432,7 +438,7 @@
           }
           
           if (this.editedIndex > -1) {
-            
+            item._id = this.editedItem._id,
             ipcRenderer.send('schedule:edit', item)
           } else {
             ipcRenderer.send('schedule:add', item)
